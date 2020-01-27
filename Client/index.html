@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tank.io</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <article id="gui">
+			<section id="chat">
+        <ul id="msg"></ul>
+        <input type="text" id="msgin">
+			</section>
+    </article>
+  </body>
+  <script src="https://threejs.org/build/three.min.js"></script>
+  <script src="../socket.io/socket.io.js"></script>
+  <script type="module" src="./lib.js"></script>
+  <script type="module" src="./event.js"></script>
+  <script type="module" src="./game.js"></script>
+</html>
