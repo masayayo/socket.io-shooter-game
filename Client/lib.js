@@ -39,12 +39,8 @@ export class Player {
     this.hp = hp
   }
   update() {
-    this.r = Math.atan2(game.my - game.height / 2, game.mx - game.width / 2)
-    this.move()
-    this.x += this.vx
-    this.y += this.vy
-    game.camera.position.x = this.main.position.x
-    game.camera.position.y = this.main.position.y
+    game.camera.position.x = this.x;
+    game.camera.position.y = this.y;
   }
   draw() {
     this.main.rotation.z = this.r
