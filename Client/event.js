@@ -9,9 +9,9 @@ socket.on("playerMove", ({ id, x, y }) => {
   game.players[id].x = x
   game.players[id].y = y
 })
-socket.on("playerRotate", ({ id, r }) => {
+socket.on("playerRotate", ({ id, turret_r }) => {
   if (!(id in game.players)) return
-  game.players[id].r = r
+  game.players[id].turret_r = turret_r
 })
 // socket.on("playerBullet")
 socket.on("playerDisconnect", id => {

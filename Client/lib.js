@@ -6,7 +6,8 @@ export class Player {
     vx,
     vy,
     y,
-    r,
+    turret_r,
+    camera_r,
     speed,
     size,
     shootspeed,
@@ -18,20 +19,25 @@ export class Player {
     this.color = color
     this.x = x
     this.y = y
-    this.r = r
+    this.turret_r = turret_r
+    this.camera_r = camera_r
+    this.rotation_speed = Math.PI / 72
     this.vx = vx || 0
     this.vy = vy || 0
     this.id = id
     this.speed = speed
+    this.player = new THREE.Group()
     this.main = new THREE.Group()
     this.tank = new THREE.Mesh(
       geometry.player,
-      new THREE.MeshBasicMaterial({ color })
+      new THREE.MeshBasicMaterial({ color, wireframe: true })
     )
     this.turret = new THREE.Mesh(geometry.turret, material.turret)
     this.hpbar = new THREE.Mesh(
       geometry.hpbar,
-      new THREE.MeshBasicMaterial({ color: `hsl(${hp},69%,54%)` })
+      new THREE.MeshBasicMaterial({
+        color: `hsl(${hp},69%,54%)`
+      })
     )
     this.bullets = bullets
     this.shootspeed = shootspeed
@@ -39,21 +45,42 @@ export class Player {
     this.hp = hp
   }
   update() {
-    game.camera.position.x = this.x;
-    game.camera.position.y = this.y;
+    this.move()
+    this.turret_r = Math.atan2(
+      game.my - game.height / 2,
+      game.mx - game.width / 2
+    )
+    this.x += this.vx
+    this.y += this.vy
+    game.camera.position.x = this.main.position.x
+    game.camera.position.y = this.main.position.y
+    game.camera.rotation.z = this.camera_r
   }
   draw() {
-    this.main.rotation.z = this.r
-    this.main.position.set(this.x, this.y, 0)
+    this.main.rotation.z = this.turret_r + this.camera_r
 
-    this.hpbar.position.set(this.x, this.y - this.size - 20, 0)
+    this.hpbar.position.set(
+      this.x + (this.size + 20) * Math.sin(this.camera_r),
+      this.y - (this.size + 20) * Math.cos(this.camera_r),
+      0
+    )
+    this.hpbar.rotation.z = this.camera_r
     this.hpbar.scale.x = this.hp / 100
     this.hpbar.material.color.set(`hsl(${this.hp},69%,54%)`)
   }
   move() {
-    let m = (key.isDown(key.UP) - key.isDown(key.DOWN)) * this.speed
-    this.vy = Math.sin(this.r) * m
-    this.vx = Math.cos(this.r) * m
+    this.camera_r +=
+      (key.isDown(key.Q) - key.isDown(key.E)) * this.rotation_speed
+    let dir = new THREE.Vector3(
+      key.isDown(key.RIGHT) - key.isDown(key.LEFT),
+      key.isDown(key.UP) - key.isDown(key.DOWN),
+      0
+    )
+    let angle = new THREE.Euler(0, 0, this.camera_r, "XYZ")
+    dir.applyEuler(angle)
+    this.main.position.addScaledVector(dir, this.speed)
+    this.x = this.main.position.x
+    this.y = this.main.position.y
   }
 }
 export const game = {
@@ -89,31 +116,38 @@ export const key = {
   UP: 87,
   RIGHT: 68,
   DOWN: 83,
+  Q: 81,
+  E: 69,
 
-  isDown: (keyCode) => {
+  isDown: keyCode => {
     return key._pressed[keyCode] ? 1 : 0
   },
 
-  onKeyDown: (event) => {
+  onKeyDown: event => {
     key._pressed[event.keyCode] = true
   },
 
-  onKeyUp: (event) => {
+  onKeyUp: event => {
     delete key._pressed[event.keyCode]
   }
 }
 
-export const addPlayer = (player) => {
+export const addPlayer = player => {
   let p = new Player(player)
   // align turret in group
   p.turret.rotation.z = p.main.rotation.z = p.tank.rotation.z =
-    p.r - Math.PI / 2
-  p.turret.position.set(Math.cos(p.r) * p.size, Math.sin(p.r) * p.size, 0)
+    p.turret_r - Math.PI / 2
+  p.turret.position.set(
+    Math.cos(p.turret_r) * p.size,
+    Math.sin(p.turret_r) * p.size,
+    0
+  )
   //add to scene
+  p.player.add(p.main)
+  p.player.add(p.hpbar)
   p.main.add(p.tank)
   p.main.add(p.turret)
-  game.scene.add(p.main)
-  game.scene.add(p.hpbar)
+  game.scene.add(p.player)
 
   game.players[p.id] = p
   console.log(p.id)

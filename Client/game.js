@@ -43,7 +43,7 @@ const update = () => {
       x: game.players[socket.id].x,
       y: game.players[socket.id].y
     })
-    socket.emit("rotate", { r: game.players[socket.id].r })
+    socket.emit("rotate", { turret_r: game.players[socket.id].turret_r })
   }
   requestAnimationFrame(update)
 }
