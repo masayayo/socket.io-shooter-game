@@ -52,12 +52,14 @@ export class Player {
     )
     this.x += this.vx
     this.y += this.vy
-    game.camera.position.x = this.main.position.x
-    game.camera.position.y = this.main.position.y
+    game.camera.position.x = this.x
+    game.camera.position.y = this.y
     game.camera.rotation.z = this.camera_r
   }
   draw() {
     this.main.rotation.z = this.turret_r + this.camera_r
+    this.main.position.x = this.x
+    this.main.position.y = this.y
 
     this.hpbar.position.set(
       this.x + (this.size + 20) * Math.sin(this.camera_r),
@@ -78,9 +80,14 @@ export class Player {
     )
     let angle = new THREE.Euler(0, 0, this.camera_r, "XYZ")
     dir.applyEuler(angle)
-    this.main.position.addScaledVector(dir, this.speed)
-    this.x = this.main.position.x
-    this.y = this.main.position.y
+    let newPos = new THREE.Vector3(
+      this.main.position.x,
+      this.main.position.y,
+      0
+    )
+    newPos.addScaledVector(dir, this.speed)
+    this.x = newPos.x
+    this.y = newPos.y
   }
 }
 export const game = {
