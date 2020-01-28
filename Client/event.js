@@ -1,7 +1,7 @@
-import { addPlayer, game, socket,addMsg } from "./lib.js"
+import { addPlayer, game, socket, addMsg } from "./lib.js"
 
-socket.on("newPlayer", (player) => addPlayer(player))
-socket.on("currentPlayers", (players) =>
+socket.on("newPlayer", player => addPlayer(player))
+socket.on("currentPlayers", players =>
   Object.entries(players).forEach(([key, val]) => addPlayer(val))
 )
 socket.on("playerMove", ({ id, x, y }) => {
@@ -9,14 +9,13 @@ socket.on("playerMove", ({ id, x, y }) => {
   game.players[id].x = x
   game.players[id].y = y
 })
-socket.on("playerRotate", ({ id, r }) => {
+socket.on("playerRotate", ({ id, turret_r }) => {
   if (!(id in game.players)) return
-  game.players[id].r = r
+  game.players[id].turret_r = turret_r
 })
 // socket.on("playerBullet")
-socket.on("playerDisconnect", (id) => {
-  game.scene.remove(game.players[id].main)
-  game.scene.remove(game.players[id].hpbar)
+socket.on("playerDisconnect", id => {
+  game.scene.remove(game.players[id].player)
   delete game.players[id]
 })
-socket.on('msg',msg=>addMsg(msg))
+socket.on("msg", msg => addMsg(msg))

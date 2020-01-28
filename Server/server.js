@@ -9,17 +9,17 @@ app.get("/", (req, res) =>
 )
 const players = {}
 
-io.on("connection", (socket) => {
+io.on("connection", socket => {
   socket.on("disconnect", () => {
     io.emit("playerDisconnect", socket.id)
     delete players[socket.id]
   })
 
   socket.on("msg", msg => {
-    io.emit('msg', msg)
+    io.emit("msg", msg)
   })
 
-  socket.on("name", (name) => {
+  socket.on("name", name => {
     socket.broadcast.emit("newPlayer", createPlayer(name, socket.id))
     socket.emit("currentPlayers", players)
   })
@@ -37,11 +37,11 @@ io.on("connection", (socket) => {
 
   socket.on(
     "rotate",
-    ({ r }) =>
+    ({ turret_r }) =>
       socket.id in players &&
       socket.broadcast.emit("playerRotate", {
         id: socket.id,
-        r: (players[socket.id].r = r)
+        turret_r: (players[socket.id].turret_r = turret_r)
       })
   )
 })
@@ -53,7 +53,9 @@ const createPlayer = (name, id) =>
     id,
     x: 0,
     y: 0,
-    r: 0,
+    turret_r: 0,
+    camera_r: 0,
+    rotation_speed: Math.PI / 72,
     speed: 5,
     vx: 0,
     vy: 0,
@@ -64,4 +66,4 @@ const createPlayer = (name, id) =>
     hp: 100
   })
 
-http.listen(8181, () => console.log("listening on *:3000"))
+http.listen(3000, () => console.log("listening on *:8181"))
