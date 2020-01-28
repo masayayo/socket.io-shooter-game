@@ -9,20 +9,20 @@ const init = () => {
   //listeners
   window.addEventListener("keyup", key.onKeyUp, false)
   window.addEventListener("keydown", key.onKeyDown, false)
-  window.addEventListener("mousemove", (event) => {
+  window.addEventListener("mousemove", event => {
     game.mx = event.pageX
     game.my = game.height - event.pageY
   })
-  document.getElementById('msgin').addEventListener('keydown', sendMsg,false)
+  document.getElementById("msgin").addEventListener("keydown", sendMsg, false)
 
   //grid
-  var size = 10000;
-  var divisions = 100;
+  var size = 10000
+  var divisions = 100
 
-  var gridHelper = new THREE.GridHelper(size, divisions,0xaaccc8,0x446658);
-  gridHelper.rotation.x=Math.PI*1.5
-  gridHelper.position.z=-1
-  game.scene.add(gridHelper);
+  var gridHelper = new THREE.GridHelper(size, divisions, 0xaaccc8, 0x446658)
+  gridHelper.rotation.x = Math.PI * 1.5
+  gridHelper.position.z = -1
+  game.scene.add(gridHelper)
 
   //register
   socket.emit("name", "kms")

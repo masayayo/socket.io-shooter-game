@@ -9,17 +9,17 @@ app.get("/", (req, res) =>
 )
 const players = {}
 
-io.on("connection", (socket) => {
+io.on("connection", socket => {
   socket.on("disconnect", () => {
     io.emit("playerDisconnect", socket.id)
     delete players[socket.id]
   })
 
   socket.on("msg", msg => {
-    io.emit('msg', msg)
+    io.emit("msg", msg)
   })
 
-  socket.on("name", (name) => {
+  socket.on("name", name => {
     socket.broadcast.emit("newPlayer", createPlayer(name, socket.id))
     socket.emit("currentPlayers", players)
   })
@@ -64,4 +64,4 @@ const createPlayer = (name, id) =>
     hp: 100
   })
 
-http.listen(8181, () => console.log("listening on *:3000"))
+http.listen(8181, () => console.log("listening on *:8181"))
