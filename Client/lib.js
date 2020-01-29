@@ -177,3 +177,14 @@ export const sendMsg = event => {
     document.getElementById("msgin").value = ""
   }
 }
+
+import { FPS, realtime } from "./consts.js"
+
+export const canUpdatePhysics = () => {
+  realtime.deltaTime = new Date().getTime()
+  if (realtime.deltaTime > realtime.startTime + FPS) {
+    realtime.startTime = realtime.deltaTime
+    return true
+  }
+  return false
+}

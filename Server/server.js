@@ -66,4 +66,4 @@ const createPlayer = (name, id) =>
     hp: 100
   })
 
-http.listen(8181, () => console.log("listening on *:8181"))
+http.listen(3000, () => console.log("listening on *:8181"))

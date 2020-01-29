@@ -1,4 +1,4 @@
-import { game, key, socket, addMsg, sendMsg } from "./lib.js"
+import { game, key, socket, addMsg, sendMsg, canUpdatePhysics } from "./lib.js"
 
 const init = () => {
   game.camera.position.set(game.width / 2, game.height / 2, 100)
@@ -28,22 +28,23 @@ const init = () => {
   socket.emit("name", "kms")
   update()
 }
-
 const update = () => {
-  // upddate your shit, and draw all
+  // update your shit, and draw all
   if (Object.entries(game.players).length !== 0) {
-    game.players[socket.id].update()
+    if (canUpdatePhysics()) {
+      // Physics
+      game.players[socket.id].update()
+      socket.emit("move", {
+        x: game.players[socket.id].x,
+        y: game.players[socket.id].y
+      })
+      socket.emit("rotate", { turret_r: game.players[socket.id].turret_r })
+    }
+    // Draw
     Object.entries(game.players).forEach(([k, x]) => {
       x.draw()
     })
-
     game.renderer.render(game.scene, game.camera)
-
-    socket.emit("move", {
-      x: game.players[socket.id].x,
-      y: game.players[socket.id].y
-    })
-    socket.emit("rotate", { turret_r: game.players[socket.id].turret_r })
   }
   requestAnimationFrame(update)
 }
