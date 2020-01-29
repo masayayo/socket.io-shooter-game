@@ -78,6 +78,7 @@ export class Player {
       key.isDown(key.UP) - key.isDown(key.DOWN),
       0
     )
+    dir.normalize()
     let angle = new THREE.Euler(0, 0, this.camera_r, "XYZ")
     dir.applyEuler(angle)
     let newPos = new THREE.Vector3(
