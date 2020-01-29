@@ -27,6 +27,7 @@ export class Player {
     this.id = id
     this.speed = speed
     this.player = new THREE.Group()
+    this.hpbarWrapper = new THREE.Group()
     this.main = new THREE.Group()
     this.tank = new THREE.Mesh(
       geometry.player,
@@ -52,21 +53,20 @@ export class Player {
     )
     this.x += this.vx
     this.y += this.vy
+
     game.camera.position.x = this.x
     game.camera.position.y = this.y
     game.camera.rotation.z = this.camera_r
   }
   draw() {
-    this.main.rotation.z = this.turret_r + this.camera_r
-    this.main.position.x = this.x
-    this.main.position.y = this.y
+    this.player.rotation.z = this.camera_r
+    this.main.rotation.z = this.turret_r
 
-    this.hpbar.position.set(
-      this.x + (this.size + 20) * Math.sin(this.camera_r),
-      this.y - (this.size + 20) * Math.cos(this.camera_r),
-      0
-    )
-    this.hpbar.rotation.z = this.camera_r
+    this.player.position.x = this.x
+    this.player.position.y = this.y
+
+    this.hpbarWrapper.rotation.z =
+      -this.camera_r + game.players[socket.id].camera_r
     this.hpbar.scale.x = this.hp / 100
     this.hpbar.material.color.set(`hsl(${this.hp},69%,54%)`)
   }
@@ -81,14 +81,9 @@ export class Player {
     dir.normalize()
     let angle = new THREE.Euler(0, 0, this.camera_r, "XYZ")
     dir.applyEuler(angle)
-    let newPos = new THREE.Vector3(
-      this.main.position.x,
-      this.main.position.y,
-      0
-    )
-    newPos.addScaledVector(dir, this.speed)
-    this.x = newPos.x
-    this.y = newPos.y
+
+    this.vx = dir.x * this.speed
+    this.vy = dir.y * this.speed
   }
 }
 export const game = {
@@ -150,9 +145,12 @@ export const addPlayer = player => {
     Math.sin(p.turret_r) * p.size,
     0
   )
+  p.hpbar.position.set(0, -(p.size + 20), 0)
+
   //add to scene
   p.player.add(p.main)
-  p.player.add(p.hpbar)
+  p.player.add(p.hpbarWrapper)
+  p.hpbarWrapper.add(p.hpbar)
   p.main.add(p.tank)
   p.main.add(p.turret)
   game.scene.add(p.player)
