@@ -63,8 +63,7 @@ export class Player {
     this.player.position.x = this.x
     this.player.position.y = this.y
 
-    this.hpbarWrapper.rotation.z =
-      -this.camera_r + game.players[socket.id].camera_r
+    this.hpbarWrapper.rotation.z = game.client.camera_r - this.camera_r
     this.hpbar.scale.x = this.hp / 100
     this.hpbar.material.color.set(`hsl(${this.hp},69%,54%)`)
   }
