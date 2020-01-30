@@ -3,3 +3,4 @@ export const realtime = {
   startTime: new Date().getTime(),
   deltaTime: 0
 }
+export const socket = io()

@@ -1,3 +1,5 @@
+import { FPS, realtime, socket } from "./consts.js"
+
 export class Player {
   constructor({
     name,
@@ -159,8 +161,6 @@ export const addPlayer = player => {
   console.log(p.id)
 }
 
-export const socket = io()
-
 export const addMsg = msg => {
   let a = document.createElement("li")
   a.textContent = msg
@@ -176,12 +176,10 @@ export const sendMsg = event => {
   }
 }
 
-import { FPS, realtime } from "./consts.js"
-
 export const canUpdatePhysics = () => {
-  realtime.deltaTime = new Date().getTime()
-  if (realtime.deltaTime > realtime.startTime + FPS) {
-    realtime.startTime = realtime.deltaTime
+  realtime.deltaTime += new Date().getTime() - realtime.startTime
+  if (realtime.deltaTime > FPS) {
+    realtime.deltaTime -= FPS
     return true
   }
   return false

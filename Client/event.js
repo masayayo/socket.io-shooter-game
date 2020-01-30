@@ -1,4 +1,5 @@
-import { addPlayer, game, socket, addMsg } from "./lib.js"
+import { addPlayer, game, addMsg } from "./lib.js"
+import { socket } from "./consts.js"
 
 socket.on("newPlayer", player => addPlayer(player))
 socket.on("currentPlayers", players =>

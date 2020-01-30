@@ -1,4 +1,5 @@
-import { game, key, socket, addMsg, sendMsg, canUpdatePhysics } from "./lib.js"
+import { game, key, addMsg, sendMsg, canUpdatePhysics } from "./lib.js"
+import { realtime, socket } from "./consts.js"
 
 const init = () => {
   game.camera.position.set(game.width / 2, game.height / 2, 100)
@@ -45,6 +46,9 @@ const update = () => {
       x.draw()
     })
     game.renderer.render(game.scene, game.camera)
+
+    // Reset startTime
+    realtime.startTime = new Date().getTime()
   }
   requestAnimationFrame(update)
 }
