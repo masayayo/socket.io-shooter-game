@@ -6,7 +6,7 @@ socket.on("newPlayer", player => {
   addPlayer(player)
 })
 socket.on("currentPlayers", players => {
-  Object.entries(players).forEach(([key, val]) => addPlayer(val))
+  Object.values(players).forEach(p => addPlayer(p))
   game.client = game.players[socket.id]
   update()
 })

@@ -62,7 +62,7 @@ export class Player {
   }
   draw() {
     this.player.rotation.z = this.camera_r
-    this.main.rotation.z = this.turret_r
+    this.main.rotation.z = this.turret_r - Math.PI / 2
 
     this.player.position.x = this.x
     this.player.position.y = this.y
@@ -92,8 +92,8 @@ export const game = {
   players: {},
   width: window.innerWidth,
   height: window.innerHeight,
-  mx: 0,
-  my: 0,
+  mx: window.innerWidth / 2,
+  my: window.innerHeight,
   scene: new THREE.Scene(),
   camera: new THREE.OrthographicCamera(
     window.innerWidth / -2,
@@ -108,7 +108,7 @@ export const game = {
 export const geometry = {
   hpbar: new THREE.PlaneGeometry(50, 5),
   player: new THREE.CircleGeometry(25, 8),
-  turret: new THREE.PlaneGeometry(16, 20),
+  turret: new THREE.PlaneGeometry(20, 16),
   bullet: new THREE.CircleGeometry(5, 8)
 }
 export const material = {
@@ -140,8 +140,7 @@ export const key = {
 export const addPlayer = player => {
   let p = new Player(player)
   // align turret in group
-  p.turret.rotation.z = p.main.rotation.z = p.tank.rotation.z =
-    p.turret_r - Math.PI / 2
+  p.turret.rotation.z = p.tank.rotation.z = p.turret_r
   p.turret.position.set(
     Math.cos(p.turret_r) * p.size,
     Math.sin(p.turret_r) * p.size,
