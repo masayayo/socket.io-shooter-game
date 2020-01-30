@@ -21,7 +21,7 @@ const init = () => {
   var divisions = 100
 
   var gridHelper = new THREE.GridHelper(size, divisions, 0xaaccc8, 0x446658)
-  gridHelper.rotation.x = Math.PI * 1.5
+  gridHelper.rotation.x = Math.PI / 2
   gridHelper.position.z = -1
   game.scene.add(gridHelper)
 
