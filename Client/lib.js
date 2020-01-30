@@ -12,8 +12,6 @@ export class Player {
     camera_r,
     speed,
     size,
-    shootspeed,
-    bullets,
     id,
     hp
   }) {
@@ -42,8 +40,6 @@ export class Player {
         color: `hsl(${hp},69%,54%)`
       })
     )
-    this.bullets = bullets
-    this.shootspeed = shootspeed
     this.size = size
     this.hp = hp
   }
@@ -157,7 +153,6 @@ export const addPlayer = player => {
   game.scene.add(p.player)
 
   game.players[p.id] = p
-  console.log(p.id)
 }
 
 export const addMsg = msg => {

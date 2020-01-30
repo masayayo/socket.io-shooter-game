@@ -53,14 +53,10 @@ const createPlayer = (name, id) =>
     y: 0,
     turret_r: Math.PI / 2,
     camera_r: 0,
-    rotation_speed: Math.PI / 72,
     speed: 5,
     vx: 0,
     vy: 0,
-    shootspeed: 20,
-    bullets: {},
     size: 25,
-    cooldown: true,
     hp: 100
   })
 
