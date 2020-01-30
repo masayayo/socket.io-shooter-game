@@ -27,29 +27,27 @@ const init = () => {
 
   //register
   socket.emit("name", "kms")
-  update()
 }
-const update = () => {
+export const update = () => {
   // update your shit, and draw all
-  if (Object.entries(game.players).length !== 0) {
-    if (canUpdatePhysics()) {
-      // Physics
-      game.players[socket.id].update()
-      socket.emit("move", {
-        x: game.players[socket.id].x,
-        y: game.players[socket.id].y
-      })
-      socket.emit("rotate", { turret_r: game.players[socket.id].turret_r })
-    }
-    // Draw
-    Object.entries(game.players).forEach(([k, x]) => {
-      x.draw()
+  if (canUpdatePhysics()) {
+    // Physics
+    game.client.update()
+    socket.emit("move", {
+      x: game.client.x,
+      y: game.client.y
     })
-    game.renderer.render(game.scene, game.camera)
-
-    // Reset startTime
-    realtime.startTime = new Date().getTime()
+    socket.emit("rotate", { turret_r: game.client.turret_r })
   }
+  // Draw
+  Object.entries(game.players).forEach(([k, x]) => {
+    x.draw()
+  })
+  game.renderer.render(game.scene, game.camera)
+
+  // Reset startTime
+  realtime.startTime = new Date().getTime()
+
   requestAnimationFrame(update)
 }
 

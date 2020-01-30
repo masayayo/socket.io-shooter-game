@@ -1,10 +1,15 @@
 import { addPlayer, game, addMsg } from "./lib.js"
 import { socket } from "./consts.js"
+import { update } from "./game.js"
 
-socket.on("newPlayer", player => addPlayer(player))
-socket.on("currentPlayers", players =>
+socket.on("newPlayer", player => {
+  addPlayer(player)
+})
+socket.on("currentPlayers", players => {
   Object.entries(players).forEach(([key, val]) => addPlayer(val))
-)
+  game.client = game.players[socket.id]
+  update()
+})
 socket.on("playerMove", ({ id, x, y }) => {
   if (!(id in game.players)) return
   game.players[id].x = x
