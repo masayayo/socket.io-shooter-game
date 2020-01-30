@@ -3,9 +3,7 @@
   "version": "0.0.1",
   "description": "socket.io game",
   "dependencies": {
-    "bufferutil": "^4.0.1",
     "express": "^4.17.1",
-    "socket.io": "^2.3.0",
-    "utf-8-validate": "^5.0.2"
+    "socket.io": "^2.3.0"
   }
 }

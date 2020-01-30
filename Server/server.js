@@ -16,7 +16,7 @@ io.on("connection", socket => {
   })
 
   socket.on("msg", msg => {
-    io.emit("msg", msg)
+    io.emit("msg", socket.id + ": " + msg)
   })
 
   socket.on("name", name => {
@@ -35,15 +35,13 @@ io.on("connection", socket => {
       })
   )
 
-  socket.on(
-    "rotate",
-    ({ turret_r }) =>
-      socket.id in players &&
+  socket.on("rotate", ({ turret_r }) => {
+    socket.id in players &&
       socket.broadcast.emit("playerRotate", {
         id: socket.id,
         turret_r: (players[socket.id].turret_r = turret_r)
       })
-  )
+  })
 })
 
 const createPlayer = (name, id) =>
@@ -53,16 +51,12 @@ const createPlayer = (name, id) =>
     id,
     x: 0,
     y: 0,
-    turret_r: 0,
+    turret_r: Math.PI / 2,
     camera_r: 0,
-    rotation_speed: Math.PI / 72,
     speed: 5,
     vx: 0,
     vy: 0,
-    shootspeed: 20,
-    bullets: {},
     size: 25,
-    cooldown: true,
     hp: 100
   })
 

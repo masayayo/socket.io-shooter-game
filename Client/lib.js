@@ -1,3 +1,5 @@
+import { FPS, realtime, socket } from "./consts.js"
+
 export class Player {
   constructor({
     name,
@@ -10,8 +12,6 @@ export class Player {
     camera_r,
     speed,
     size,
-    shootspeed,
-    bullets,
     id,
     hp
   }) {
@@ -40,8 +40,6 @@ export class Player {
         color: `hsl(${hp},69%,54%)`
       })
     )
-    this.bullets = bullets
-    this.shootspeed = shootspeed
     this.size = size
     this.hp = hp
   }
@@ -60,7 +58,7 @@ export class Player {
   }
   draw() {
     this.player.rotation.z = this.camera_r
-    this.main.rotation.z = this.turret_r
+    this.main.rotation.z = this.turret_r - Math.PI / 2
 
     this.player.position.x = this.x
     this.player.position.y = this.y
@@ -90,8 +88,8 @@ export const game = {
   players: {},
   width: window.innerWidth,
   height: window.innerHeight,
-  mx: 0,
-  my: 0,
+  mx: window.innerWidth / 2,
+  my: window.innerHeight,
   scene: new THREE.Scene(),
   camera: new THREE.OrthographicCamera(
     window.innerWidth / -2,
@@ -106,7 +104,7 @@ export const game = {
 export const geometry = {
   hpbar: new THREE.PlaneGeometry(50, 5),
   player: new THREE.CircleGeometry(25, 8),
-  turret: new THREE.PlaneGeometry(16, 20),
+  turret: new THREE.PlaneGeometry(20, 16),
   bullet: new THREE.CircleGeometry(5, 8)
 }
 export const material = {
@@ -138,8 +136,7 @@ export const key = {
 export const addPlayer = player => {
   let p = new Player(player)
   // align turret in group
-  p.turret.rotation.z = p.main.rotation.z = p.tank.rotation.z =
-    p.turret_r - Math.PI / 2
+  p.turret.rotation.z = p.tank.rotation.z = p.turret_r
   p.turret.position.set(
     Math.cos(p.turret_r) * p.size,
     Math.sin(p.turret_r) * p.size,
@@ -156,10 +153,7 @@ export const addPlayer = player => {
   game.scene.add(p.player)
 
   game.players[p.id] = p
-  console.log(p.id)
 }
-
-export const socket = io()
 
 export const addMsg = msg => {
   let a = document.createElement("li")
@@ -174,4 +168,13 @@ export const sendMsg = event => {
     socket.emit("msg", inp)
     document.getElementById("msgin").value = ""
   }
+}
+
+export const canUpdatePhysics = () => {
+  realtime.deltaTime += new Date().getTime() - realtime.startTime
+  if (realtime.deltaTime > FPS) {
+    realtime.deltaTime -= FPS
+    return true
+  }
+  return false
 }

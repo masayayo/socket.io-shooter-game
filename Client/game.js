@@ -1,4 +1,5 @@
-import { game, key, socket, addMsg, sendMsg } from "./lib.js"
+import { game, key, addMsg, sendMsg, canUpdatePhysics } from "./lib.js"
+import { realtime, socket } from "./consts.js"
 
 const init = () => {
   game.camera.position.set(game.width / 2, game.height / 2, 100)
@@ -20,31 +21,33 @@ const init = () => {
   var divisions = 100
 
   var gridHelper = new THREE.GridHelper(size, divisions, 0xaaccc8, 0x446658)
-  gridHelper.rotation.x = Math.PI * 1.5
+  gridHelper.rotation.x = Math.PI / 2
   gridHelper.position.z = -1
   game.scene.add(gridHelper)
 
   //register
   socket.emit("name", "kms")
-  update()
 }
-
-const update = () => {
-  // upddate your shit, and draw all
-  if (Object.entries(game.players).length !== 0) {
-    game.players[socket.id].update()
-    Object.entries(game.players).forEach(([k, x]) => {
-      x.draw()
-    })
-
-    game.renderer.render(game.scene, game.camera)
-
+export const update = () => {
+  // update your shit, and draw all
+  if (canUpdatePhysics()) {
+    // Physics
+    game.client.update()
     socket.emit("move", {
-      x: game.players[socket.id].x,
-      y: game.players[socket.id].y
+      x: game.client.x,
+      y: game.client.y
     })
-    socket.emit("rotate", { turret_r: game.players[socket.id].turret_r })
+    socket.emit("rotate", { turret_r: game.client.turret_r })
   }
+  // Draw
+  Object.entries(game.players).forEach(([k, x]) => {
+    x.draw()
+  })
+  game.renderer.render(game.scene, game.camera)
+
+  // Reset startTime
+  realtime.startTime = new Date().getTime()
+
   requestAnimationFrame(update)
 }
 
