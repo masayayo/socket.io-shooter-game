@@ -16,7 +16,7 @@ io.on("connection", socket => {
   })
 
   socket.on("msg", msg => {
-    io.emit("msg", msg)
+    io.emit("msg", socket.id + ": " + msg)
   })
 
   socket.on("name", name => {
@@ -36,12 +36,12 @@ io.on("connection", socket => {
   )
 
   socket.on("rotate", ({ turret_r }) => {
-      socket.id in players &&
+    socket.id in players &&
       socket.broadcast.emit("playerRotate", {
         id: socket.id,
         turret_r: (players[socket.id].turret_r = turret_r)
       })
-})
+  })
 })
 
 const createPlayer = (name, id) =>
