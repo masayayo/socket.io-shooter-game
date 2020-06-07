@@ -1,4 +1,46 @@
 import { FPS, realtime, socket } from "./consts.js"
+import { distanceToPoint } from "./util.js"
+
+export class Bullet {
+  constructor({
+    id,
+    color,
+    x,
+    y,
+    parent,
+    size,
+    speed,
+    range,
+    r
+  }) {
+    this.id = id
+    this.color = color
+    this.x = x
+    this.y = y
+    this.parent = parent
+    this.size = size
+    this.speed = speed
+    this.range = range
+    this.r = r
+    this.sx = x
+    this.sy = y
+    this.vx = Math.cos(r) * speed
+    this.vy = Math.sin(r) * speed
+    this.object = new THREE.Mesh(geometry.bullet, new THREE.MeshBasicMaterial({ color, wireframe: true }))
+    game.scene.add(this.object)
+    this.object.position.set(x, y, 0)
+  }
+  update() {
+    this.x += this.vx
+    this.y += this.vy
+    this.object.position.set(this.x, this.y, 0)
+    let a = (distanceToPoint(this.sx, this.sy, this.x, this.y))
+    if (a > this.range) {
+      game.scene.remove(this.object)
+      delete this.parent.bullets[this.object.id]
+    }
+  }
+}
 
 export class Player {
   constructor({
@@ -13,7 +55,10 @@ export class Player {
     speed,
     size,
     id,
-    hp
+    hp,
+    bulletSize,
+    bulletSpeed,
+    bulletRange
   }) {
     this.name = name
     this.color = color
@@ -42,8 +87,15 @@ export class Player {
     )
     this.size = size
     this.hp = hp
+    this.shootTime = true
+    this.fireRate = 1000
+    this.bullets = {}
+    this.bulletSize = bulletSize
+    this.bulletSpeed = bulletSpeed
+    this.bulletRange = bulletRange
   }
   update() {
+    Object.values(this.bullets).forEach(x => x.update())
     this.move()
     this.turret_r = Math.atan2(
       game.my - game.height / 2,
@@ -52,10 +104,34 @@ export class Player {
     this.x += this.vx
     this.y += this.vy
 
+    if (this.canShoot()) {
+      this.shoot()
+    }
+
     game.camera.position.x = this.x
     game.camera.position.y = this.y
     game.camera.rotation.z = this.camera_r
   }
+  canShoot() {
+    return key.isDown("mouse") && this.shootTime
+  }
+
+  shoot() {
+    let b = new Bullet({
+      color: this.color,
+      x: this.x,
+      y: this.y,
+      parent: this,
+      size: this.bulletSize,
+      speed: this.bulletSpeed,
+      range: this.bulletRange,
+      r: this.turret_r + this.camera_r
+    })
+    this.bullets[b.object.id] = b
+    this.shootTime = false
+    setTimeout(_ => this.shootTime = true, this.fireRate)
+  }
+
   draw() {
     this.player.rotation.z = this.camera_r
     this.main.rotation.z = this.turret_r - Math.PI / 2
@@ -126,9 +202,15 @@ export const key = {
   onKeyDown: event => {
     key._pressed[event.keyCode] = true
   },
+  onMouseDown: event => {
+    key._pressed["mouse"] = true
+  },
 
   onKeyUp: event => {
     delete key._pressed[event.keyCode]
+  },
+  onMouseUp: event => {
+    delete key._pressed["mouse"]
   }
 }
 
@@ -137,7 +219,7 @@ export const addPlayer = player => {
   // align turret in group
   p.turret_r = Math.PI / 2
   p.turret.rotation.z = p.tank.rotation.z = p.turret_r
-  
+
   p.turret.position.set(
     Math.cos(p.turret_r) * p.size,
     Math.sin(p.turret_r) * p.size,

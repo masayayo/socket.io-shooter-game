@@ -57,7 +57,10 @@ const createPlayer = (name, id) =>
     vx: 0,
     vy: 0,
     size: 25,
-    hp: 100
+    hp: 100,
+    bulletSpeed: 30,
+    bulletSize: 10,
+    bulletRange: 500
   })
 
 http.listen(8181, () => console.log("listening on *:8181"))

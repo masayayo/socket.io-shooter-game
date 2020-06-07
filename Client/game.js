@@ -10,10 +10,12 @@ const init = () => {
   //listeners
   window.addEventListener("keyup", key.onKeyUp, false)
   window.addEventListener("keydown", key.onKeyDown, false)
-  window.addEventListener("mousemove", event => {
+  window.addEventListener("mousemove", (event) => {
     game.mx = event.pageX
     game.my = game.height - event.pageY
   })
+  window.addEventListener("mousedown", key.onMouseDown, false)
+  window.addEventListener("mouseup", key.onMouseUp, false)
   document.getElementById("msgin").addEventListener("keydown", sendMsg, false)
 
   //grid
@@ -35,9 +37,11 @@ export const update = () => {
     game.client.update()
     socket.emit("move", {
       x: game.client.x,
-      y: game.client.y
+      y: game.client.y,
     })
-    socket.emit("rotate", { turret_r: game.client.turret_r + game.client.camera_r })
+    socket.emit("rotate", {
+      turret_r: game.client.turret_r + game.client.camera_r,
+    })
   }
   // Draw
   Object.entries(game.players).forEach(([k, x]) => {
