@@ -37,7 +37,7 @@ export const update = () => {
       x: game.client.x,
       y: game.client.y
     })
-    socket.emit("rotate", { turret_r: game.client.turret_r })
+    socket.emit("rotate", { turret_r: game.client.turret_r + game.client.camera_r })
   }
   // Draw
   Object.entries(game.players).forEach(([k, x]) => {
