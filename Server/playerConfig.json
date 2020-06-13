@@ -3,7 +3,7 @@
         "red":{
             "name" : "Red",
             "sprite" : {
-                "path": "./sprites/red.png",
+                "path": "./Sprites/red.png",
                 "animationTiles": "4",
                 "animationSpeed": 100
             }
@@ -11,7 +11,7 @@
         "blue":{
             "name" : "Blue",
             "sprite" : {
-                "path": "./sprites/blue.png",
+                "path": "./Sprites/blue.png",
                 "animationTiles": "4",
                 "animationSpeed": 100
             }
@@ -19,7 +19,7 @@
         "green":{
             "name" : "Green",
             "sprite" : {
-                "path": "./sprites/green.png",
+                "path": "./Sprites/green.png",
                 "animationTiles": "4",
                 "animationSpeed": 100
             }

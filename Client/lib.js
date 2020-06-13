@@ -238,7 +238,7 @@ export const addPlayer = player => {
   p.sprite = playerMesh
   p.moving = false
   
-  let directionSprite = new THREE.TextureLoader().load( "./sprites/arrow.png" )
+  let directionSprite = new THREE.TextureLoader().load( "./Sprites/arrow.png" )
   let directionMaterial = new THREE.MeshBasicMaterial( { map: directionSprite ,opacity: 0.9, transparent: true } );
   let directionMesh = new THREE.Mesh( geometry.direction, directionMaterial );
   directionMesh.position.x = p.x
