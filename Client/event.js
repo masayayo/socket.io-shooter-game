@@ -10,16 +10,18 @@ socket.on("currentPlayers", players => {
   game.client = game.players[socket.id]
   update()
 })
-socket.on("playerMove", ({ id, x, y }) => {
+socket.on("playerMove", ({ id, x, y, facing, moving }) => {
   if (!(id in game.players)) return
   game.players[id].x = x
   game.players[id].y = y
+  game.players[id].facing = facing
+  game.players[id].moving = moving
 })
-socket.on("playerRotate", ({ id, turret_r }) => {
+socket.on("playerRotate", ({ id, direction_r, camera_r }) => {
   if (!(id in game.players)) return
-  game.players[id].turret_r = turret_r
+  game.players[id].direction_r = direction_r
+  game.players[id].camera_r = camera_r
 })
-// socket.on("playerBullet")
 socket.on("playerDisconnect", id => {
   game.scene.remove(game.players[id].player)
   delete game.players[id]

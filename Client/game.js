@@ -14,6 +14,8 @@ const init = () => {
     game.mx = event.pageX
     game.my = game.height - event.pageY
   })
+  window.addEventListener("mousedown", key.onMouseDown, false)
+  window.addEventListener("mouseup", key.onMouseUp, false)
   document.getElementById("msgin").addEventListener("keydown", sendMsg, false)
 
   //grid
@@ -35,13 +37,28 @@ export const update = () => {
     game.client.update()
     socket.emit("move", {
       x: game.client.x,
-      y: game.client.y
+      y: game.client.y,
+      facing: game.client.facing,
+      moving: game.client.moving
     })
-    socket.emit("rotate", { turret_r: game.client.turret_r + game.client.camera_r })
+    socket.emit("rotate", { 
+      direction_r: game.client.direction_r,
+      camera_r: game.client.camera_r
+     })
   }
+
+
   // Draw
   Object.entries(game.players).forEach(([k, x]) => {
     x.draw()
+    if(k !== game.client.id){
+      x.main.rotation.z -= game.client.camera_r
+      x.direction.rotation.z = x.camera_r
+      x.rotateSprite(x.facing)
+    }
+    x.animateSprite(x.moving)
+    x.rotateSpriteCamera(game.client.camera_r)
+    
   })
   game.renderer.render(game.scene, game.camera)
 

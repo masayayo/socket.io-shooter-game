@@ -2,6 +2,8 @@ const express = require("express")
 const app = express()
 const http = require("http").createServer(app)
 const io = require("socket.io")(http)
+const config = require("./playerConfig.json")
+
 
 app.use(express.static(__dirname + "/../Client"))
 app.get("/", (req, res) =>
@@ -20,44 +22,49 @@ io.on("connection", socket => {
   })
 
   socket.on("name", name => {
-    socket.broadcast.emit("newPlayer", createPlayer(name, socket.id))
+    socket.broadcast.emit("newPlayer", createPlayer(config.playerClasses.blue, name, socket.id))
     socket.emit("currentPlayers", players)
   })
 
   socket.on(
     "move",
-    ({ x, y }) =>
+    ({ x, y, facing, moving }) =>
       socket.id in players &&
       socket.broadcast.emit("playerMove", {
         id: socket.id,
         x: (players[socket.id].x = x),
-        y: (players[socket.id].y = y)
+        y: (players[socket.id].y = y),
+        facing: (players[socket.id].facing = facing),
+        moving: (players[socket.id].moving = moving)
       })
   )
 
-  socket.on("rotate", ({ turret_r }) => {
+  socket.on("rotate", ({ direction_r, camera_r }) => {
     socket.id in players &&
       socket.broadcast.emit("playerRotate", {
         id: socket.id,
-        turret_r: (players[socket.id].turret_r = turret_r)
+        direction_r: (players[socket.id].direction_r = direction_r),
+        camera_r: (players[socket.id].camera_r = camera_r)
       })
   })
 })
 
-const createPlayer = (name, id) =>
+const createPlayer = (config, name, id) =>
   (players[id] = {
+    config: config,
     name,
     color: `hsl(${Math.floor(Math.random() * 360)},69%,54%)`,
     id,
     x: 0,
     y: 0,
-    turret_r: Math.PI / 2,
+    direction_r: Math.PI / 2,
     camera_r: 0,
     speed: 5,
     vx: 0,
     vy: 0,
     size: 25,
-    hp: 100
+    hp: 100,
+    facing: null
   })
 
 http.listen(8181, () => console.log("listening on *:8181"))
