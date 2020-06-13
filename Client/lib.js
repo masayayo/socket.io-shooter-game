@@ -34,11 +34,27 @@ export class Bullet {
     this.x += this.vx
     this.y += this.vy
     this.object.position.set(this.x, this.y, 0)
-    let a = (distanceToPoint(this.sx, this.sy, this.x, this.y))
-    if (a > this.range) {
-      game.scene.remove(this.object)
-      delete this.parent.bullets[this.object.id]
+    if (game.client.id === this.parent) {
+      let a = (distanceToPoint(this.sx, this.sy, this.x, this.y))
+      if (a > this.range) {
+        this.killBullet()
+      }
     }
+  }
+  checkHit(px, py, playerId) {
+    //console.log(px)
+    if (this.parent != playerId) {
+      if (this.x > px - 15 && this.x < px + 15 && this.y > py - 15 && this.y < py + 15) {
+        console.log(this.x)
+        this.killBullet()
+      }
+    }
+
+  }
+  killBullet() {
+    game.scene.remove(this.object)
+    delete game.bullets[this.object.id]
+    socket.emit("killBullet", this.id)
   }
 }
 
@@ -85,17 +101,26 @@ export class Player {
         color: `hsl(${hp},69%,54%)`
       })
     )
+    this.hitbox = new THREE.Mesh(
+      geometry.hitbox,
+      material.turret
+    )
     this.size = size
     this.hp = hp
     this.shootTime = true
     this.fireRate = 1000
-    this.bullets = {}
     this.bulletSize = bulletSize
     this.bulletSpeed = bulletSpeed
     this.bulletRange = bulletRange
   }
   update() {
-    Object.values(this.bullets).forEach(x => x.update())
+    Object.values(game.bullets).forEach(x => {
+      x.update()
+      x.checkHit(
+        this.x, this.y, this.id
+      )
+    })
+
     this.move()
     this.turret_r = Math.atan2(
       game.my - game.height / 2,
@@ -121,13 +146,26 @@ export class Player {
       color: this.color,
       x: this.x,
       y: this.y,
-      parent: this,
+      parent: this.id,
       size: this.bulletSize,
       speed: this.bulletSpeed,
       range: this.bulletRange,
       r: this.turret_r + this.camera_r
     })
-    this.bullets[b.object.id] = b
+    let id = this.id + b.object.id
+    game.bullets[id] = b
+    b.id = id
+    socket.emit("createBullet", ({
+      id: id,
+      color: this.color,
+      x: this.x,
+      y: this.y,
+      parent: this.id,
+      size: this.bulletSize,
+      speed: this.bulletSpeed,
+      range: this.bulletRange,
+      r: this.turret_r + this.camera_r
+    }))
     this.shootTime = false
     setTimeout(_ => this.shootTime = true, this.fireRate)
   }
@@ -161,6 +199,7 @@ export class Player {
 }
 export const game = {
   players: {},
+  bullets: {},
   width: window.innerWidth,
   height: window.innerHeight,
   mx: window.innerWidth / 2,
@@ -180,7 +219,8 @@ export const geometry = {
   hpbar: new THREE.PlaneGeometry(50, 5),
   player: new THREE.CircleGeometry(25, 8),
   turret: new THREE.PlaneGeometry(20, 16),
-  bullet: new THREE.CircleGeometry(5, 8)
+  bullet: new THREE.CircleGeometry(5, 8),
+  hitbox: new THREE.CircleGeometry(15, 15)
 }
 export const material = {
   turret: new THREE.MeshBasicMaterial({ color: 0xb3b1ad })
@@ -231,11 +271,17 @@ export const addPlayer = player => {
   p.player.add(p.main)
   p.player.add(p.hpbarWrapper)
   p.hpbarWrapper.add(p.hpbar)
+  p.player.add(p.hitbox)
   p.main.add(p.tank)
   p.main.add(p.turret)
   game.scene.add(p.player)
 
   game.players[p.id] = p
+}
+
+export const addBullet = b => {
+  let bull = new Bullet(b)
+  game.bullets[bull.id] = bull
 }
 
 export const addMsg = msg => {

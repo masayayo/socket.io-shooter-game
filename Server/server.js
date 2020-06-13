@@ -8,7 +8,7 @@ app.get("/", (req, res) =>
   res.sendFile("index.html", { root: __dirname + "/../Client" })
 )
 const players = {}
-
+const bullets = {}
 io.on("connection", socket => {
   socket.on("disconnect", () => {
     io.emit("playerDisconnect", socket.id)
@@ -21,7 +21,7 @@ io.on("connection", socket => {
 
   socket.on("name", name => {
     socket.broadcast.emit("newPlayer", createPlayer(name, socket.id))
-    socket.emit("currentPlayers", players)
+    socket.emit("currentPlayers", { players, bullets })
   })
 
   socket.on(
@@ -42,8 +42,16 @@ io.on("connection", socket => {
         turret_r: (players[socket.id].turret_r = turret_r)
       })
   })
-})
 
+  socket.on("createBullet", b => {
+    bullets[b.id] = b
+    socket.broadcast.emit("createBullet", b)
+  })
+  socket.on("killBullet", id => {
+    socket.broadcast.emit("killBullet", id)
+    delete bullets[id]
+  })
+})
 const createPlayer = (name, id) =>
   (players[id] = {
     name,
@@ -58,9 +66,10 @@ const createPlayer = (name, id) =>
     vy: 0,
     size: 25,
     hp: 100,
-    bulletSpeed: 30,
+    bulletSpeed: 1,
     bulletSize: 10,
     bulletRange: 500
   })
+
 
 http.listen(8181, () => console.log("listening on *:8181"))

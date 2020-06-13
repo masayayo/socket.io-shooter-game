@@ -35,6 +35,7 @@ export const update = () => {
   if (canUpdatePhysics()) {
     // Physics
     game.client.update()
+    Object.values(game.bullets).forEach(x => x.update())
     socket.emit("move", {
       x: game.client.x,
       y: game.client.y,
