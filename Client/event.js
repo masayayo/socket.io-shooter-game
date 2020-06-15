@@ -6,14 +6,16 @@ socket.on("init", (config) => {
   initGame(config)
 })
 
-socket.on("newPlayer", player => {
-  addPlayer(player)
+socket.on("newPlayer", ({ playerConfig, name, id}) => {
+  let newPlayer = addPlayer(playerConfig, name, id)
+  socket.emit("newPlayerAdded", newPlayer)
 })
 socket.on("currentPlayers", players => {
   Object.values(players).forEach(p => {
     // Check if player already exist
     if(!game.players[p.id]) {
-      addPlayer(p)
+      // Don't need the return in this case
+      addPlayer(p.config, p.name, p.id)
     }
   })
   game.client = game.players[socket.id]

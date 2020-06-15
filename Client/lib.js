@@ -220,8 +220,22 @@ export const key = {
   }
 }
 
-export const addPlayer = player => {
-  let p = new Player(player)
+export const addPlayer = (playerConfig, name, id) => {
+  let p = new Player({
+    id: id,
+    config: playerConfig,
+    name: name,
+    color: `hsl(${Math.floor(Math.random() * 360)},69%,54%)`,
+    x: 0,
+    y: 0,
+    direction_r: Math.PI / 2,
+    camera_r: 0,
+    speed: 5,
+    vx: 0,
+    vy: 0,
+    size: 25,
+    hp: 100
+  })
   
   // Load and add sprites
   let playerSprite = new THREE.TextureLoader().load( p.config.sprite.path )
@@ -247,14 +261,13 @@ export const addPlayer = player => {
   directionMesh.scale.y = 48
   directionMesh.scale.z = 1
   p.direction = directionMesh
-  
 
   p.direction_r = Math.PI / 2
-  p.direction.rotation.z = 0//p.direction_r
+  p.direction.rotation.z = 0
   
   p.sprite.position.set(0, p.size - 8, 0)
   p.direction.position.set(0,0,0)
-  p.hpbar.position.set(0, -(p.size)/*-(p.size + 20)*/, 0)
+  p.hpbar.position.set(0, -(p.size), 0)
 
   //add to scene
   p.player.add(p.main)
@@ -265,6 +278,8 @@ export const addPlayer = player => {
   game.scene.add(p.player)
 
   game.players[p.id] = p
+
+  return p
 }
 
 export const addMsg = msg => {
