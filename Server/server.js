@@ -24,8 +24,12 @@ io.on("connection", socket => {
   })
 
   socket.on("name", name => {
-    socket.broadcast.emit("newPlayer", createPlayer(config.playerClasses[name], name, socket.id))
-    socket.emit("currentPlayers", players)
+    socket.emit("newPlayer", {playerConfig: config.playerClasses[name], name: name, id: socket.id})
+  })
+
+  socket.on("newPlayerAdded", newPlayer => {
+    players[socket.id] = newPlayer
+    io.emit("currentPlayers", players) // Will probably be changed to io.in().emit() later when introducing rooms/
   })
 
   socket.on(
@@ -50,24 +54,5 @@ io.on("connection", socket => {
       })
   })
 })
-
-const createPlayer = (config, name, id) =>
-  (players[id] = {
-    config: config,
-    name,
-    color: `hsl(${Math.floor(Math.random() * 360)},69%,54%)`,
-    id,
-    x: 0,
-    y: 0,
-    direction_r: Math.PI / 2,
-    camera_r: 0,
-    speed: 5,
-    vx: 0,
-    vy: 0,
-    size: 25,
-    hp: 100,
-    facing: null,
-    sprite: null
-  })
 
 http.listen(8181, () => console.log("listening on *:8181"))

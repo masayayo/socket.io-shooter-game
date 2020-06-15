@@ -96,6 +96,5 @@ function loadCharacterSelectScreen(config) {
 
 function characterSelected(){
   document.getElementsByClassName("container")[0].remove()
-  console.log("Emitting new player...")
   socket.emit("name", this.value)
 }
