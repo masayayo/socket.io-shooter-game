@@ -1,14 +1,25 @@
 import { addPlayer, game, addMsg } from "./lib.js"
 import { socket } from "./consts.js"
-import { update } from "./game.js"
+import { initGame, update } from "./game.js"
+
+socket.on("init", (config) => {
+  initGame(config)
+})
 
 socket.on("newPlayer", player => {
   addPlayer(player)
 })
 socket.on("currentPlayers", players => {
-  Object.values(players).forEach(p => addPlayer(p))
+  Object.values(players).forEach(p => {
+    // Check if player already exist
+    if(!game.players[p.id]) {
+      addPlayer(p)
+    }
+  })
   game.client = game.players[socket.id]
-  update()
+  if(game.players[socket.id]){
+    update()
+  }
 })
 socket.on("playerMove", ({ id, x, y, facing, moving }) => {
   if (!(id in game.players)) return
@@ -23,7 +34,11 @@ socket.on("playerRotate", ({ id, direction_r, camera_r }) => {
   game.players[id].camera_r = camera_r
 })
 socket.on("playerDisconnect", id => {
-  game.scene.remove(game.players[id].player)
-  delete game.players[id]
+  if(game.players[id]) {
+    game.scene.remove(game.players[id].player)
+    delete game.players[id]
+  }else{
+    delete game.players[id]
+  }
 })
 socket.on("msg", msg => addMsg(msg))

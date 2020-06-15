@@ -12,6 +12,8 @@ app.get("/", (req, res) =>
 const players = {}
 
 io.on("connection", socket => {
+  socket.emit("init", config)
+
   socket.on("disconnect", () => {
     io.emit("playerDisconnect", socket.id)
     delete players[socket.id]
@@ -22,7 +24,7 @@ io.on("connection", socket => {
   })
 
   socket.on("name", name => {
-    socket.broadcast.emit("newPlayer", createPlayer(config.playerClasses.blue, name, socket.id))
+    socket.broadcast.emit("newPlayer", createPlayer(config.playerClasses[name], name, socket.id))
     socket.emit("currentPlayers", players)
   })
 
@@ -64,7 +66,8 @@ const createPlayer = (config, name, id) =>
     vy: 0,
     size: 25,
     hp: 100,
-    facing: null
+    facing: null,
+    sprite: null
   })
 
 http.listen(8181, () => console.log("listening on *:8181"))
