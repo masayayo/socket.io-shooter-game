@@ -84,7 +84,6 @@ export class Player {
       key.isDown(key.UP) - key.isDown(key.DOWN),
       0
     )
-    dir.normalize()
     
     // In case only moving with keyboard just rotate the sprite to the closest vector UP,DOWN,LEFT,RIGHT based on dir
     if(!key.isDown("mouse")){
@@ -101,6 +100,7 @@ export class Player {
     dir.applyEuler(angle)
 
     this.rotateSpriteCamera()
+    dir.normalize()
     
     this.vx = dir.x * this.speed
     this.vy = dir.y * this.speed
