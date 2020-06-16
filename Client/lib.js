@@ -279,6 +279,9 @@ export const addPlayer = (playerConfig, name, id) => {
 
   game.players[p.id] = p
 
+  // Reset the timer when the player is added to the game
+  realtime.startTime = new Date().getTime()
+
   return p
 }
 
@@ -297,11 +300,13 @@ export const sendMsg = event => {
   }
 }
 
-export const canUpdatePhysics = () => {
-  realtime.deltaTime += new Date().getTime() - realtime.startTime
-  if (realtime.deltaTime > FPS) {
-    realtime.deltaTime -= FPS
-    return true
+export const canUpdatePhysics = (windowVisible) => {
+  if(windowVisible) {
+    realtime.deltaTime += new Date().getTime() - realtime.startTime
+    if (realtime.deltaTime > FPS) {
+      realtime.deltaTime -= FPS
+      return true
+    }
+    return false
   }
-  return false
 }
