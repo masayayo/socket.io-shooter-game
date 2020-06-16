@@ -31,7 +31,7 @@ export const initGame = (config) => {
 
 export const update = () => {
   // update your shit, and draw all
-  if (canUpdatePhysics()) {
+  if (canUpdatePhysics(windowVisible)) {
     // Physics
     game.client.update()
     socket.emit("move", {
@@ -97,4 +97,35 @@ function loadCharacterSelectScreen(config) {
 function characterSelected(){
   document.getElementsByClassName("container")[0].remove()
   socket.emit("name", this.value)
+}
+
+// Set the name of the hidden property and the change event for visibility
+var hidden, visibilityChange, windowVisible = true;
+if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
+  hidden = "hidden";
+  visibilityChange = "visibilitychange";
+} else if (typeof document.msHidden !== "undefined") {
+  hidden = "msHidden";
+  visibilityChange = "msvisibilitychange";
+} else if (typeof document.webkitHidden !== "undefined") {
+  hidden = "webkitHidden";
+  visibilityChange = "webkitvisibilitychange";
+}
+
+function handleVisibilityChange() {
+  if (document[hidden]) {
+    windowVisible = false
+  } else {
+    windowVisible = true
+    realtime.startTime = new Date().getTime()
+    realtime.deltaTime = 0
+  }
+}
+
+// Warn if the browser doesn't support addEventListener or the Page Visibility API
+if (typeof document.addEventListener === "undefined" || hidden === undefined) {
+  console.log("This demo requires a browser, such as Google Chrome or Firefox, that supports the Page Visibility API.");
+} else {
+  // Handle page visibility change
+  document.addEventListener(visibilityChange, handleVisibilityChange, false);
 }
